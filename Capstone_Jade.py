@@ -1,8 +1,3 @@
-# SPGL Minimal Code by /u/wynand1004 AKA @TokyoEdTech
-# Requires SPGL Version 0.8 or Above
-# SPGL Documentation on Github: https://wynand1004.github.io/SPGL
-# Use this as the starting point for your own games
-
 # Import SPGL
 import spgl
 import os 
@@ -59,7 +54,7 @@ class Black(spgl.Sprite):
 		spgl.Sprite.__init__(self, shape, color, x, y)
 
 	def place_random(self):
-		self.goto(random.randint(-350, 350), random.randint(-350,350))
+		self.goto(random.randint(-340, 340), random.randint(-340,340))
 		
 
 class Color(spgl.Sprite):
@@ -67,7 +62,7 @@ class Color(spgl.Sprite):
 		spgl.Sprite.__init__(self, shape, color, x, y) 
         
 	def place_random(self):
-		self.goto(random.randint(-350, 350), random.randint(-350,350))    
+		self.goto(random.randint(-340, 340), random.randint(-340,340))    
     
         
 class Boxes(spgl.Sprite):
@@ -79,15 +74,22 @@ class Boxes(spgl.Sprite):
 
 
 # Initial Game setup
-game = spgl.Game(800, 800, "grey", "Collect the Rainbow",0)
+game = spgl.Game(800, 800, "grey", "Collect the Rainbow",5)
+game.set_background("rainbow.gif")
 game.lives = 3 
 game.timer = 120 
 
+
+
 # Create Sprites
-player = Player("triangle", "yellow", 200, -200, 1)
+player = Player("triangle", "white", random.randint(-350, 350), random.randint(-350,350), 1)
 border = Border()
-box = Boxes("square", "white", 100, 0)
-black = Black("circle", "black", 1500, 1500)
+black1 = Black("circle", "black", 1500, 1500)
+black2 = Black("circle", "black", 1500, 1500)
+black3 = Black("circle", "black", 1500, 1500)
+black4 = Black("circle", "black", 1500, 1500)
+black5 = Black("circle", "black", 1500, 1500)
+
 color1 = Color("circle", "red", 1500, 1500)
 color2 = Color("circle", "orange", 1500, 1500)
 color3 = Color("circle", "yellow", 1500, 1500)
@@ -97,31 +99,35 @@ color6 = Color("circle", "navy", 1500, 1500)
 color7 = Color("circle", "purple", 1500, 1500)
 
 
+colors = [color1, color2, color3, color4, color5, color6, color7]
+game.current_color = 0
+remaining_colors = [color1, color2, color3, color4, color5, color6, color7]
+
+
+
+blacks = [black1, black2, black3, black4, black5]
+
 border.draw_border()
 
 # Create Functions
 
 
 def place_circle():
-	computer_choice = random.randint(1,2)
+	computer_choice = random.randint(1,4)
 	if computer_choice == 1:
+		black = random.choice(blacks)
 		black.place_random()
-	elif computer_choice == 2:
-		color_choice = random.randint(1,7)
-		if color_choice == 1:
-			color1.place_random()
-		elif color_choice == 2:
-			color2.place_random()
-		elif color_choice == 3:
-			color3.place_random()
-		elif color_choice == 4:
-			color4.place_random()
-		elif color_choice == 5:
-			color5.place_random()
-		elif color_choice == 6:
-			color6.place_random()
-		elif color_choice == 7:
-			color7.place_random()
+	else:
+		if len(remaining_colors) > 0:
+			next_color = random.choice(remaining_colors)
+			remaining_colors.remove(next_color)
+			next_color.place_random()		
+
+def place_color():
+	next_color = random.choice(remaining_colors1)
+	remaining_colors1.remove(next_color)
+	next_color.place_random()
+	
 
 # Create Labels
 lbl_lives = spgl.Label("Lives left: 3", "red", -350, 360)
@@ -144,35 +150,64 @@ turtle.onkey(player.go_forward, "Up")
 turtle.onkey(player.go_backward, "Down")
 turtle.onkey(player.turn_right, "Right")
 
-rainbow = 0 
+#blacks = []
+#for count in range(100):
+	#blacks.append(Black("circle", "black", 1500, 1500))
+
+boxes = []
+coordinates = [(-300, -25), (-250, 25), (-250, 25), (-250, 25), (-200, -25),(-150,25),(-100,-25),(-50,25),(0,-25),(0,-25),(0,-25),(0,-25),(50,25),(100,-25),(150,25),(150,25),(150,25),(200,-25),(250,25),(250,25),(300,-25),(300,-25)]
+for coordinate in coordinates:
+	boxes.append(Boxes("box.gif", "white", coordinate[0], coordinate[1]))
+
+
 
 while True:
     # Call the game tick method
 	game.tick()
 	#start the game time
-	if game.is_collision(player, box):
-		box.destroy()
-		place_circle()
-		print("COLLISION")
+	for box in boxes:
+		if game.is_collision(player, box):
+			box.destroy()
+			place_circle()
+			print("COLLISION")
+			
+			
+	for black in blacks:			
+		if game.is_collision(player, black):
+			blacks.remove(black)
+			black.destroy()
+			game.lives -= 1	
+			lbl_lives.update("Lifes Left: {}".format(game.lives))
 
-	if game.is_collision(player, black):
-		black.destroy()
-		game.lives -= 1	
-		lbl_lives.update("Lifes Left: {}".format(game.lives))
-    	
-	if game.is_collision(player, color1):
-		rainbow += 1
-		color1.destroy()
+	for color in colors:
+		if game.is_collision(player, color):
+			if color == colors[game.current_color]:
+				color.destroy()
+				game.current_color += 1
+			else:
+				game.lives -= 1
+				lbl_lives.update("Lifes Left: {}".format(game.lives))
+				color.destroy()
+				#something has gone wrong
+		if remaining_colors == []:
+			remaining_colors = [color1, color2, color3, color4, color5, color6, color7]
+
 	
-	if rainbow == 7:
+	if game.current_color == 7:
 		print("You win!")
-	
+		#splash screen 
+		
+		
 	if game.lives <= 0:
 		quit()
+		#splash screen 
+	
+	if game.timer < 30 and len(remaining_colors) == 0:
+		place_circle()	
 		
 	if game.timer == 0:
 		quit()
-    	
+    	#splash screen 
     
     	
     			
