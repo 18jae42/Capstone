@@ -14,10 +14,26 @@ class Player(spgl.Sprite):
 		
 	def go_forward(self):
 		self.fd(10)
+		if self.xcor() > 340:
+			self.setx(340)
+		if self.xcor() < -340:
+			self.setx(-340)
+		if self.ycor() > 340:
+			self.sety(340)
+		if self.ycor() < -340:
+			self.sety(-340)
 	
 	def go_backward(self):
 		self.fd(-10)
-		
+		if self.xcor() > 340:
+			self.setx(340)
+		if self.xcor() < -340:
+			self.setx(-340)
+		if self.ycor() > 340:
+			self.sety(340)
+		if self.ycor() < -340:
+			self.sety(-340)
+			
 	def turn_left(self):
 		self.lt(30)
 		
@@ -55,6 +71,9 @@ class Black(spgl.Sprite):
 
 	def place_random(self):
 		self.goto(random.randint(-340, 340), random.randint(-340,340))
+	def play_sound(self, filename):
+		os.system("afplay {}&".format(filename))
+
 		
 
 class Color(spgl.Sprite):
@@ -62,27 +81,33 @@ class Color(spgl.Sprite):
 		spgl.Sprite.__init__(self, shape, color, x, y) 
         
 	def place_random(self):
-		self.goto(random.randint(-340, 340), random.randint(-340,340))    
+		self.goto(random.randint(-340, 340), random.randint(-340,340))
+	def play_sound(self, filename):
+		os.system("afplay {}&".format(filename))  
+	 
     
         
 class Boxes(spgl.Sprite):
     def __init__(self, shape, color, x, y):
         spgl.Sprite.__init__(self, shape, color, x, y)
-        
+    def play_sound(self, filename):
+    	os.system("afplay {}&".format(filename))
+    
 
     
 
 
 # Initial Game setup
-game = spgl.Game(800, 800, "grey", "Collect the Rainbow",5)
+game = spgl.Game(800, 800, "grey", "Collect the Rainbow",10)
 game.set_background("rainbow.gif")
 game.lives = 3 
 game.timer = 120 
-
+game.play_sound("back.mp3 -v 0.1", 169)
 
 
 # Create Sprites
 player = Player("triangle", "white", random.randint(-350, 350), random.randint(-350,350), 1)
+player.shapesize(0.5, 1, 0)
 border = Border()
 black1 = Black("circle", "black", 1500, 1500)
 black2 = Black("circle", "black", 1500, 1500)
@@ -170,6 +195,7 @@ while True:
 			box.destroy()
 			place_circle()
 			print("COLLISION")
+			box.play_sound("box.wav") 
 			
 			
 	for black in blacks:			
@@ -178,28 +204,47 @@ while True:
 			black.destroy()
 			game.lives -= 1	
 			lbl_lives.update("Lifes Left: {}".format(game.lives))
+			black.play_sound("black.mp3")
 
 	for color in colors:
 		if game.is_collision(player, color):
 			if color == colors[game.current_color]:
 				color.destroy()
+				color.play_sound("color.mp3")
 				game.current_color += 1
 			else:
 				game.lives -= 1
 				lbl_lives.update("Lifes Left: {}".format(game.lives))
 				color.destroy()
+				color.play_sound("black.mp3")
 				#something has gone wrong
 		if remaining_colors == []:
 			remaining_colors = [color1, color2, color3, color4, color5, color6, color7]
 
 	
 	if game.current_color == 7:
+		for color in colors:
+			color.destroy
+		for black in blacks:
+			black.destroy
+		for box in boxes:
+			box.destroy 
+		player.destroy
+		game.set_background("success.gif")
 		print("You win!")
 		#splash screen 
 		
 		
 	if game.lives <= 0:
-		quit()
+		for color in colors:
+			color.destroy
+		for black in blacks:
+			black.destroy
+		for box in boxes:
+			box.destroy 
+		player.destroy
+		game.set_background("failure.gif")
+		#quit() after 5 seconds
 		#splash screen 
 	
 	if game.timer < 30 and len(remaining_colors) == 0:
