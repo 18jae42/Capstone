@@ -4,6 +4,7 @@ import os
 import turtle 
 import random
 import math
+import time
 
 # Create Classes
 class Player(spgl.Sprite):
@@ -224,35 +225,60 @@ while True:
 	
 	if game.current_color == 7:
 		for color in colors:
-			color.destroy
+			color.destroy()
 		for black in blacks:
-			black.destroy
+			black.destroy()
 		for box in boxes:
-			box.destroy 
-		player.destroy
+			box.destroy()
+		player.goto(-1000, -1000)
+		border.clear()
+		os.system("killall afplay")
+		lbl_lives.update("")
+		lbl_time.update("")
 		game.set_background("success.gif")
-		print("You win!")
-		#splash screen 
-		
+		game.tick()
+		time.sleep(5)
+		exit()
+				
 		
 	if game.lives <= 0:
 		for color in colors:
-			color.destroy
+			color.destroy()
 		for black in blacks:
-			black.destroy
+			black.destroy()
 		for box in boxes:
-			box.destroy 
-		player.destroy
+			box.destroy()
+		player.goto(-1000, -1000)
+		border.clear()
+		os.system("killall afplay")
+		lbl_lives.update("")
+		lbl_time.update("")
 		game.set_background("failure.gif")
-		#quit() after 5 seconds
-		#splash screen 
+		game.tick()
+		time.sleep(5)
+		exit()
+		 
 	
 	if game.timer < 30 and len(remaining_colors) == 0:
 		place_circle()	
 		
 	if game.timer == 0:
-		quit()
-    	#splash screen 
+		for color in colors:
+			color.destroy()
+		for black in blacks:
+			black.destroy()
+		for box in boxes:
+			box.destroy ()
+		player.goto(-1000, -1000)
+		border.clear()
+		os.system("killall afplay")
+		lbl_lives.update("")
+		lbl_time.update("")
+		game.set_background("failure.gif")
+		game.tick()
+		time.sleep(5)
+		exit()
+		
     
     	
     			
