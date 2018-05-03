@@ -204,7 +204,7 @@ while True:
 			blacks.remove(black)
 			black.destroy()
 			game.lives -= 1	
-			lbl_lives.update("Lifes Left: {}".format(game.lives))
+			lbl_lives.update("Lives Left: {}".format(game.lives))
 			black.play_sound("black.mp3")
 
 	for color in colors:
@@ -215,7 +215,7 @@ while True:
 				game.current_color += 1
 			else:
 				game.lives -= 1
-				lbl_lives.update("Lifes Left: {}".format(game.lives))
+				lbl_lives.update("Lives Left: {}".format(game.lives))
 				color.destroy()
 				color.play_sound("black.mp3")
 				#something has gone wrong
